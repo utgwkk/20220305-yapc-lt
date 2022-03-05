@@ -17,3 +17,7 @@ sub epic () { return 1 }
 
 just epic.
 2011-2022;
+
+__END__
+$ perl -Ilocal/lib/perl5 just-epic.pl --port 9999
+$ curl localhost:9999

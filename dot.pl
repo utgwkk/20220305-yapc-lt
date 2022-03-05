@@ -62,3 +62,4 @@ digraph haisen {
 
 __END__
 $ perl dot.pl | dot -Tpng -oout.png
+$ open out.png

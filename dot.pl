@@ -5,20 +5,7 @@ use feature 'say';
 binmode(STDOUT, ':utf8');
 
 sub digraph ($) {
-    print 'digraph ';
     shift->();
-}
-
-sub haisen (&) {
-    my $sub = shift;
-    my ($pkg, undef, undef, $name) = caller(0);
-    $name =~ s/\A$pkg\:://;
-    my $sub2 = sub {
-        say "$name {";
-        $sub->();
-        say '}';
-    };
-    $sub2;
 }
 
 sub UNIVERSAL::AUTOLOAD {
@@ -26,7 +13,37 @@ sub UNIVERSAL::AUTOLOAD {
 
     return if $graph =~ /DESTROY/;
     my ($src, $dst) = map { / / ? qq("$_") : $_ } split /::/, $graph;
-    say '    ', $src, ' -> ', $dst, ';';
+    push @Digraph::stash, "    $src -> $dst;";
+    Digraph->new;
+}
+
+package Digraph {
+    our @stash = ();
+    our $GRAPH_NAME = '(anonymous)';
+    our $AUTOLOAD;
+
+    sub new {
+        my ($class) = @_;
+        my $self = bless sub {
+            say "digraph $GRAPH_NAME {";
+            for (@stash) {
+                say $_;
+            }
+            say '}';
+        }, $class;
+        $self;
+    }
+
+    sub AUTOLOAD {
+        my ($self) = @_;
+        return if $AUTOLOAD =~ /DESTROY/;
+
+        my $name = $AUTOLOAD;
+        $name =~ s/\ADigraph\:://;
+
+        $GRAPH_NAME = $name;
+        $self;
+    }
 }
 
 digraph haisen {

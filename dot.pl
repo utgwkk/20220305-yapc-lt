@@ -59,3 +59,6 @@ digraph haisen {
 
     エアコン -> エアコン用コンセント;
 }
+
+__END__
+$ perl dot.pl | dot -Tpng -oout.png
